@@ -59,5 +59,8 @@ curl -v -H "Accept: application/vnd.kafka.json.v1+json" 'http://localhost:8082/t
 * https://docs.spring.io/spring-kafka/reference/html/#transactions
 * https://docs.spring.io/spring-boot/docs/current/reference/htmlsingle/#common-application-properties
 * https://www.confluent.io/blog/transactions-apache-kafka/
+* https://cloud.spring.io/spring-cloud-stream-binder-kafka/spring-cloud-stream-binder-kafka.html#_configuration_options
+* https://docs.spring.io/spring-cloud-stream/docs/current/reference/htmlsingle/#spring-cloud-stream-overview-binders
+* https://cloud.spring.io/spring-cloud-static/spring-cloud-stream-binder-kafka/3.0.0.RC1/reference/html/spring-cloud-stream-binder-kafka.html#_consuming_batches
 
 KafkaTransactionManager created in KafkaAutoConfiguration @ConditionalOnProperty(name = "spring.kafka.producer.transaction-id-prefix")

@@ -34,12 +34,12 @@ spring:
 #        #transactional.id: producer-1
 #    bootstrap-servers: localhost:19092
 #    # https://docs.spring.io/spring-boot/docs/current/reference/htmlsingle/#common-application-properties
-#    listener:
-#      # increase batch consuming: set type=batch
-#      type: batch
-#      ack-mode: batch
-#      # increase batch consuming: set poll-timeout
-#      poll-timeout: 10s
+    listener:
+      # increase batch consuming: set type=batch
+      type: batch
+      ack-mode: batch
+      # increase batch consuming: set poll-timeout
+      poll-timeout: 10s
 
 
   cloud:
@@ -49,14 +49,26 @@ spring:
 #          output:
 #            producer:
         binder:
+          consumerProperties:
+            spring.json.trusted.packages: '*'
+            isolation.level: read_committed
+            enable.auto.commit: false
+            # increase batch consuming: set max.poll.records
+            max.poll.records: 8000
+            auto.offset.reset: earliest
+            key.deserializer: org.apache.kafka.common.serialization.StringDeserializer
+            value.deserializer: org.springframework.kafka.support.serializer.JsonDeserializer
+          producerProperties:
+            key.serializer: org.apache.kafka.common.serialization.StringSerializer
+            value.serializer: org.springframework.kafka.support.serializer.JsonSerializer
           configuration:
             auto.offset.reset: earliest
           brokers: localhost
           defaultBrokerPort: 19092
           transaction:
             producer:
-#              sync: true
-#              batchTimeout: 30000
+              sync: true
+              batchTimeout: 30000
               configuration:
                 # for ordering
                 max.in.flight.requests.per.connection: 1
@@ -75,18 +87,13 @@ spring:
           group: my-group-id
           maxAttempts: 1
 #          consumer:
+#            batch-mode: true
 #            configuration:
-#              auto-offset-reset: earliest
-#              key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
-#              value-deserializer: org.springframework.kafka.support.serializer.JsonDeserializer
 
         output:
           destination: thing1
 #          producer:
 #            configuration:
-#              key-serializer: org.apache.kafka.common.serialization.StringSerializer
-#              value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
-#              transaction-id-prefix: ${spring.cloud.client.ip-address}_tx.
 
 
 tpd:
