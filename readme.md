@@ -162,7 +162,14 @@ We test adding 1 million dtos to Kafka, and write all to MongoDB.
 
 2020-02-27 19:35:17.891  INFO 2303549 --- [           main] c.e.kafkotest.KafkotestApplication       : All messages sent
 2020-02-27 19:36:40.190  INFO 2303549 --- [ntainer#0-0-C-1] c.e.kafkotest.KafkotestApplication       : received:  Payload: PracticalAdvice{message='A Practical Advice Number 999999', identifier=999999, datetime=2020-02-27T19:35:17.891611}
+```
 
+## Spring Boot 2.2.4, Kafka + MongoDB no transactions, no batch
+```
+2020-02-27 19:41:26.872  INFO 2309879 --- [ntainer#0-0-C-1] o.s.k.l.KafkaMessageListenerContainer    : my-advice-app: partitions assigned: [advice-topic-0]
+2020-02-27 19:41:27.108  INFO 2309879 --- [ntainer#0-0-C-1] c.e.kafkotest.KafkotestApplication       : received:  Payload: PracticalAdvice{message='A Practical Advice Number 0', identifier=0, datetime=2020-02-27T19:41:21.667256}
+2020-02-27 19:41:39.723  INFO 2309879 --- [           main] c.e.kafkotest.KafkotestApplication       : All messages sent
+2020-02-27 19:46:34.657  INFO 2309879 --- [ntainer#0-0-C-1] c.e.kafkotest.KafkotestApplication       : received:  Payload: PracticalAdvice{message='A Practical Advice Number 999999', identifier=999999, datetime=2020-02-27T19:41:39.723325}
 ```
 
 # TODO

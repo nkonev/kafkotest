@@ -42,17 +42,17 @@ public class KafkotestApplication implements CommandLineRunner {
 
 	@KafkaListener(topics = "${tpd.topic-name}", clientIdPrefix = "json")
 	public void listenAsObject(
-			@Payload List<PracticalAdvice> payloads
-			//@Payload PracticalAdvice payload
+			//@Payload List<PracticalAdvice> payloads
+			@Payload PracticalAdvice payload
 	) {
-		for (PracticalAdvice payload: payloads) {
+		//for (PracticalAdvice payload: payloads) {
 			int integer = Integer.parseInt(payload.getIdentifier());
 			if (integer%10000 == 0 || integer == messagesCount-1) {
 				logger.info("received:  Payload: {}", payload);
 			}
-			//mongoTemplate.insert(payload);
-		}
-		mongoTemplate.insert(payloads, PracticalAdvice.class);
+			mongoTemplate.insert(payload);
+		//}
+		//mongoTemplate.insert(payloads, PracticalAdvice.class);
 	}
 
 	@Bean
