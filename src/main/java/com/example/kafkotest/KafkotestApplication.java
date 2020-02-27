@@ -19,6 +19,7 @@ import javax.annotation.PostConstruct;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.IntStream;
+import org.springframework.transaction.support.TransactionTemplate;
 
 // https://thepracticaldeveloper.com/2018/11/24/spring-boot-kafka-config/
 @SpringBootApplication
@@ -41,6 +42,9 @@ public class KafkotestApplication implements CommandLineRunner {
 
 	private final int messagesCount = 1_000_000;
 
+	@Autowired
+	private TransactionTemplate transactionTemplate;
+
 	@Transactional
 	@KafkaListener(topics = "${tpd.topic-name}", clientIdPrefix = "json")
 	public void listenAsObject(
@@ -52,9 +56,9 @@ public class KafkotestApplication implements CommandLineRunner {
 			if (integer%10000 == 0 || integer == messagesCount-1) {
 				logger.info("received:  Payload: {}", payload);
 			}
-			//mongoTemplate.insert(payload);
+			mongoTemplate.insert(payload);
 		}
-		mongoTemplate.insert(payloads, PracticalAdvice.class);
+		//mongoTemplate.insert(payloads, PracticalAdvice.class);
 	}
 
 	@Bean
@@ -66,6 +70,7 @@ public class KafkotestApplication implements CommandLineRunner {
 	@Transactional
 	public void run(String... args) {
 		IntStream.range(0, messagesCount).forEach(i -> {
+			//transactionTemplate.executeWithoutResult(transactionStatus -> this.template.send(topicName, String.valueOf(i), new PracticalAdvice(String.valueOf(i), "A Practical Advice Number " + i, LocalDateTime.now())));
 			this.template.send(topicName, String.valueOf(i), new PracticalAdvice(String.valueOf(i), "A Practical Advice Number " + i, LocalDateTime.now()));
 		});
 		logger.info("All messages sent");
