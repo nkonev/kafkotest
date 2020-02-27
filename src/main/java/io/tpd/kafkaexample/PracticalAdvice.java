@@ -10,6 +10,8 @@ import java.time.LocalDateTime;
 public class PracticalAdvice {
 
     @Id
+    private String id;
+
     private String identifier;
     private String message;
     private LocalDateTime datetime;
@@ -54,5 +56,13 @@ public class PracticalAdvice {
 
     public void setDatetime(LocalDateTime datetime) {
         this.datetime = datetime;
+    }
+
+    public String getId() {
+        return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
     }
 }
