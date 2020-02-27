@@ -14,7 +14,6 @@ import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.messaging.handler.annotation.Payload;
-import org.springframework.transaction.annotation.Transactional;
 import javax.annotation.PostConstruct;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -41,7 +40,6 @@ public class KafkotestApplication implements CommandLineRunner {
 
 	private final int messagesCount = 1_000_000;
 
-	@Transactional
 	@KafkaListener(topics = "${tpd.topic-name}", clientIdPrefix = "json")
 	public void listenAsObject(
 			@Payload List<PracticalAdvice> payloads
@@ -63,7 +61,6 @@ public class KafkotestApplication implements CommandLineRunner {
 	}
 
 	@Override
-	@Transactional
 	public void run(String... args) {
 		IntStream.range(0, messagesCount).forEach(i -> {
 			this.template.send(topicName, String.valueOf(i), new PracticalAdvice(String.valueOf(i), "A Practical Advice Number " + i, LocalDateTime.now()));

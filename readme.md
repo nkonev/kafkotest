@@ -144,8 +144,26 @@ We test adding 1 million dtos to Kafka, and write all to MongoDB.
 
 2020-02-27 03:12:00.323  INFO 43756 --- [ntainer#0-0-C-1] c.e.kafkotest.KafkotestApplication       : received:  Payload: PracticalAdvice{message='A Practical Advice Number 0', identifier=0, datetime=2020-02-27T03:11:37.946041}
 2020-02-27 03:13:43.909  INFO 43756 --- [ntainer#0-0-C-1] c.e.kafkotest.KafkotestApplication       : received:  Payload: PracticalAdvice{message='A Practical Advice Number 999999', identifier=999999, datetime=2020-02-27T03:11:58.974225}
+
+
+# another PC
+2020-02-27 19:23:02.687  INFO 2287726 --- [ntainer#0-0-C-1] o.s.k.l.KafkaMessageListenerContainer    : my-advice-app: partitions assigned: [advice-topic-0]
+2020-02-27 19:23:22.107  INFO 2287726 --- [           main] c.e.kafkotest.KafkotestApplication       : All messages sent
+
+2020-02-27 19:23:24.062  INFO 2287726 --- [ntainer#0-0-C-1] c.e.kafkotest.KafkotestApplication       : received:  Payload: PracticalAdvice{message='A Practical Advice Number 0', identifier=0, datetime=2020-02-27T19:22:58.385260}
+2020-02-27 19:25:00.347  INFO 2287726 --- [ntainer#0-0-C-1] c.e.kafkotest.KafkotestApplication       : received:  Payload: PracticalAdvice{message='A Practical Advice Number 999999', identifier=999999, datetime=2020-02-27T19:23:22.107337}
 ```
 
+## Spring Boot 2.2.4, Kafka + MongoDB no transactions, bulk MongoDB
+```
+# another PC
+2020-02-27 19:35:03.464  INFO 2303549 --- [ntainer#0-0-C-1] o.s.k.l.KafkaMessageListenerContainer    : my-advice-app: partitions assigned: [advice-topic-0]
+2020-02-27 19:35:03.885  INFO 2303549 --- [ntainer#0-0-C-1] c.e.kafkotest.KafkotestApplication       : received:  Payload: PracticalAdvice{message='A Practical Advice Number 0', identifier=0, datetime=2020-02-27T19:34:58.034558}
+
+2020-02-27 19:35:17.891  INFO 2303549 --- [           main] c.e.kafkotest.KafkotestApplication       : All messages sent
+2020-02-27 19:36:40.190  INFO 2303549 --- [ntainer#0-0-C-1] c.e.kafkotest.KafkotestApplication       : received:  Payload: PracticalAdvice{message='A Practical Advice Number 999999', identifier=999999, datetime=2020-02-27T19:35:17.891611}
+
+```
 
 # TODO
 * Add restart unless-stopped to docker-compose
