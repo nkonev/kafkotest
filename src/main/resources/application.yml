@@ -49,7 +49,7 @@ spring:
           input:
             consumer:
               # KafkaMessageChannelBinder.createConsumerEndpoint(extendedConsumerProperties)
-              pollTimeout: 60000
+              pollTimeout: 10000
           output:
             producer:
               bufferSize: 163840
