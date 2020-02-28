@@ -12,13 +12,18 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.cloud.stream.annotation.EnableBinding;
 import org.springframework.cloud.stream.annotation.StreamListener;
+import org.springframework.cloud.stream.binder.BinderFactory;
+import org.springframework.cloud.stream.binder.kafka.KafkaMessageChannelBinder;
 import org.springframework.cloud.stream.messaging.Sink;
 import org.springframework.cloud.stream.messaging.Source;
 import org.springframework.context.annotation.Bean;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.kafka.core.*;
+import org.springframework.kafka.transaction.KafkaTransactionManager;
+import org.springframework.messaging.MessageChannel;
 import org.springframework.messaging.handler.annotation.Payload;
 import org.springframework.messaging.support.MessageBuilder;
+import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
@@ -42,19 +47,30 @@ public class KafkotestApplication implements CommandLineRunner {
 //	@Autowired
 //	private KafkaTemplate<String, Object> template;
 
+	@Bean // https://cloud.spring.io/spring-cloud-static/spring-cloud-stream-binder-kafka/3.0.2.RELEASE/reference/html/spring-cloud-stream-binder-kafka.html#_consuming_batches
+	public PlatformTransactionManager transactionManager(BinderFactory binders) {
+		ProducerFactory<byte[], byte[]> pf = ((KafkaMessageChannelBinder) binders.getBinder(null,
+				MessageChannel.class)).getTransactionalProducerFactory();
+		return new KafkaTransactionManager<>(pf);
+	}
+
 	private final int messagesCount = 1_000_000;
 
 	@Autowired
 	private Source source;
 
+	@Transactional
 	@StreamListener(Sink.INPUT)
 	public void listenAsObject(
-			//@Payload List<PracticalAdvice> payloads
-			@Payload PracticalAdvice payload
+			@Payload List<PracticalAdvice> payloads
+			//@Payload PracticalAdvice payload
 	) {
-		//if (payload.getIdentifier()%10000 == 0 || payload.getIdentifier() == messagesCount-1) {
+		logger.info("received: batch size: {}", payloads.size());
+		for (PracticalAdvice payload: payloads) {
+			if (payload.getIdentifier() % 10000 == 0 || payload.getIdentifier() == messagesCount - 1) {
 				logger.info("received:  Payload: {}", payload);
-		//}
+			}
+		}
 	}
 //
 //	@Bean
@@ -68,7 +84,7 @@ public class KafkotestApplication implements CommandLineRunner {
 		logger.info("Start sending messages");
 		IntStream.range(0, messagesCount).forEach(i -> {
 			this.source.output().send(MessageBuilder.withPayload(new PracticalAdvice("A Practical Advice Number " + i, i, LocalDateTime.now())).build());
-			logger.info("Sent {} msg", i);
+			//logger.info("Sent {} msg", i);
 		});
 		logger.info("All messages sent");
 	}

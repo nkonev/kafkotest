@@ -34,20 +34,26 @@ spring:
 #        #transactional.id: producer-1
 #    bootstrap-servers: localhost:19092
 #    # https://docs.spring.io/spring-boot/docs/current/reference/htmlsingle/#common-application-properties
-    listener:
-      # increase batch consuming: set type=batch
-      type: batch
-      ack-mode: batch
-      # increase batch consuming: set poll-timeout
-      poll-timeout: 10s
+#    listener:
+#      # increase batch consuming: set type=batch
+#      type: batch
+#      ack-mode: batch
+#      # increase batch consuming: set poll-timeout
+#      poll-timeout: 10s
 
 
   cloud:
     stream:
       kafka:
-#        bindings:
-#          output:
-#            producer:
+        bindings:
+          input:
+            consumer:
+              # KafkaMessageChannelBinder.createConsumerEndpoint(extendedConsumerProperties)
+              pollTimeout: 60000
+          output:
+            producer:
+              bufferSize: 163840
+              batchTimeout: 60000
         binder:
           consumerProperties:
             spring.json.trusted.packages: '*'
@@ -58,6 +64,8 @@ spring:
             auto.offset.reset: earliest
             key.deserializer: org.apache.kafka.common.serialization.StringDeserializer
             value.deserializer: org.springframework.kafka.support.serializer.JsonDeserializer
+#            min.fetch.bytes: 100000
+#            fetch.max.wait.ms: 30000
           producerProperties:
             key.serializer: org.apache.kafka.common.serialization.StringSerializer
             value.serializer: org.springframework.kafka.support.serializer.JsonSerializer
@@ -67,8 +75,10 @@ spring:
           defaultBrokerPort: 19092
           transaction:
             producer:
-              sync: true
-              batchTimeout: 30000
+#              sync: true
+#              batchTimeout: 30000
+              #bufferSize: 163840
+              #batchTimeout: 20000
               configuration:
                 # for ordering
                 max.in.flight.requests.per.connection: 1
@@ -86,13 +96,17 @@ spring:
           destination: thing1
           group: my-group-id
           maxAttempts: 1
-#          consumer:
-#            batch-mode: true
-#            configuration:
+          consumer:
+            batch-mode: true
+            #configuration:
+            #poll-timeout: 6s
+            maxAttempts: 1
+            useNativeDecoding: true
 
         output:
           destination: thing1
-#          producer:
+          producer:
+            useNativeEncoding: true
 #            configuration:
 
 
