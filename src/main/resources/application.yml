@@ -15,35 +15,34 @@ spring:
             consumer:
               # KafkaMessageChannelBinder.createConsumerEndpoint(extendedConsumerProperties)
               pollTimeout: 10000
-          output:
-            producer:
-              bufferSize: 163840
-              batchTimeout: 10000
+              configuration:
+                isolation.level: read_committed
+                # increase batch consuming: set max.poll.records
+                max.poll.records: 8000
+#               min.fetch.bytes: 100000
+#               fetch.max.wait.ms: 30000
+#          output:
+#            producer:
+#              bufferSize: 163840
+#              batchTimeout: 10000
         binder:
           consumerProperties:
             spring.json.trusted.packages: '*'
-            isolation.level: read_committed
             enable.auto.commit: false
-            # increase batch consuming: set max.poll.records
-            max.poll.records: 8000
             auto.offset.reset: earliest
             key.deserializer: org.apache.kafka.common.serialization.StringDeserializer
             value.deserializer: org.springframework.kafka.support.serializer.JsonDeserializer
-#            min.fetch.bytes: 100000
-#            fetch.max.wait.ms: 30000
           producerProperties:
             key.serializer: org.apache.kafka.common.serialization.StringSerializer
             value.serializer: org.springframework.kafka.support.serializer.JsonSerializer
-          configuration:
-            auto.offset.reset: earliest
           brokers: localhost
           defaultBrokerPort: 19092
           transaction:
             producer:
 #              sync: true
-#              batchTimeout: 30000
-              #bufferSize: 163840
-              #batchTimeout: 20000
+              #batchTimeout: 30000
+              bufferSize: 163840
+              batchTimeout: 20000
               configuration:
                 # for ordering
                 max.in.flight.requests.per.connection: 1
