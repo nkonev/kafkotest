@@ -99,7 +99,6 @@ spring:
           consumer:
             batch-mode: true
             #configuration:
-            #poll-timeout: 6s
             maxAttempts: 1
             useNativeDecoding: true
 
