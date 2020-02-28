@@ -53,7 +53,7 @@ spring:
           output:
             producer:
               bufferSize: 163840
-              batchTimeout: 60000
+              batchTimeout: 10000
         binder:
           consumerProperties:
             spring.json.trusted.packages: '*'
