@@ -2,20 +2,21 @@ package io.tpd.kafkaexample;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import org.springframework.data.annotation.Id;
-import org.springframework.data.mongodb.core.mapping.Document;
+import org.springframework.data.relational.core.mapping.Table;
 
 import java.time.LocalDateTime;
 
-@Document
+@Table("practical-advice")
 public class PracticalAdvice {
 
     @Id
-    private String identifier;
+    private Long identifier;
+
     private String message;
     private LocalDateTime datetime;
 
     public PracticalAdvice(
-            @JsonProperty("identifier") final String identifier,
+            @JsonProperty("identifier") final Long identifier,
             @JsonProperty("message") final String message,
             @JsonProperty("datetime") LocalDateTime datetime) {
         this.message = message;
@@ -27,7 +28,7 @@ public class PracticalAdvice {
         return message;
     }
 
-    public String getIdentifier() {
+    public Long getIdentifier() {
         return identifier;
     }
 
@@ -48,7 +49,7 @@ public class PracticalAdvice {
         this.message = message;
     }
 
-    public void setIdentifier(String identifier) {
+    public void setIdentifier(Long identifier) {
         this.identifier = identifier;
     }
 

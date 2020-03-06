@@ -89,13 +89,22 @@ services:
       KSQL_LISTENERS: "http://0.0.0.0:8088"
       KSQL_CACHE_MAX_BYTES_BUFFERING: 0
 
-  mongo:
-    image: mongo:4.2.2-bionic
-    network_mode: host
+  postgresql:
+    image: postgres:12.1
+    hostname: postgresql
+    container_name: postgresql-kafkotest
+    ports:
+      - 8432:5432
+    environment:
+      - POSTGRES_PASSWORD=postgresqlPassword
     volumes:
-      - mongo_kafkotest_data_dir:/data/db
-      - ./docker/mongo/docker-entrypoint-initdb.d:/docker-entrypoint-initdb.d
-    command: ["--replSet", "rs0"]
+      - ./postgresql_dev/docker-entrypoint-initdb.d:/docker-entrypoint-initdb.d
+      - postgresql_kafkotest_data_dir:/var/lib/postgresql/data
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "50m"
+        max-file: "1"
 
 volumes:
-  mongo_kafkotest_data_dir:
+  postgresql_kafkotest_data_dir:

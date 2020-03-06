@@ -175,6 +175,15 @@ MongoDB will inserts faster:
 2020-02-27 21:38:42.918  INFO 2424167 --- [ntainer#0-0-C-1] c.e.kafkotest.KafkotestApplication       : received:  Payload: PracticalAdvice{message='A Practical Advice Number 999999', identifier=999999, datetime=2020-02-27T21:38:05.340141}
 ```
 
+## PostgreSQL
+```
+2020-03-06 11:32:34.972  INFO 208017 --- [ntainer#0-0-C-1] o.s.k.l.KafkaMessageListenerContainer    : my-advice-app: partitions assigned: [advice-topic-0]
+2020-03-06 11:32:53.357  INFO 208017 --- [           main] c.e.kafkotest.KafkotestApplication       : All messages sent
+
+2020-03-06 11:32:54.585  INFO 208017 --- [ntainer#0-0-C-1] c.e.kafkotest.KafkotestApplication       : received:  Payload: PracticalAdvice{message='A Practical Advice Number 0', identifier=0, datetime=2020-03-06T11:32:32.106046}
+2020-03-06 11:33:23.806  INFO 208017 --- [ntainer#0-0-C-1] c.e.kafkotest.KafkotestApplication       : received:  Payload: PracticalAdvice{message='A Practical Advice Number 999999', identifier=999999, datetime=2020-03-06T11:32:53.357702}
+```
+
 # TODO
 * Add restart unless-stopped to docker-compose
 * Set volumes to Kafka and Zookeeper to be able to survive computer restart
