@@ -10,12 +10,11 @@ import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
-import org.springframework.data.mongodb.core.MongoTemplate;
+import org.springframework.data.couchbase.core.CouchbaseTemplate;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.messaging.handler.annotation.Payload;
 import org.springframework.transaction.annotation.Transactional;
-import javax.annotation.PostConstruct;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.IntStream;
@@ -34,10 +33,10 @@ public class KafkotestApplication implements CommandLineRunner {
 	private String topicName;
 
 	@Autowired
-	private KafkaTemplate<String, Object> template;
+	private KafkaTemplate<String, Object> kafkaTemplate;
 
 	@Autowired
-	private MongoTemplate mongoTemplate;
+	private CouchbaseTemplate couchbaseTemplate;
 
 	private final int messagesCount = 1_000_000;
 
@@ -54,7 +53,7 @@ public class KafkotestApplication implements CommandLineRunner {
 			}
 			//mongoTemplate.insert(payload);
 		}
-		mongoTemplate.insert(payloads, PracticalAdvice.class);
+		couchbaseTemplate.insert(payloads);
 	}
 
 	@Bean
@@ -66,16 +65,9 @@ public class KafkotestApplication implements CommandLineRunner {
 	@Transactional
 	public void run(String... args) {
 		IntStream.range(0, messagesCount).forEach(i -> {
-			this.template.send(topicName, String.valueOf(i), new PracticalAdvice(String.valueOf(i), "A Practical Advice Number " + i, LocalDateTime.now()));
+			this.kafkaTemplate.send(topicName, String.valueOf(i), new PracticalAdvice(String.valueOf(i), "A Practical Advice Number " + i, LocalDateTime.now()));
 		});
 		logger.info("All messages sent");
 	}
 
-	@PostConstruct
-	public void pc() {
-		// should not be in transaction
-		if (!mongoTemplate.collectionExists(PracticalAdvice.class)) {
-			mongoTemplate.createCollection(PracticalAdvice.class);
-		}
-	}
 }

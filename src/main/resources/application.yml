@@ -1,6 +1,15 @@
 #logging.level.org.springframework.kafka.listener: DEBUG
 
 spring:
+  data:
+    couchbase:
+      auto-index: true
+  couchbase:
+    bootstrap-hosts: localhost
+    bucket:
+      name: test
+    username: root
+    password: root00
   kafka:
     consumer:
       group-id: my-advice-app

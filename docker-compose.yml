@@ -92,7 +92,7 @@ services:
   couchbase:
     image: couchbase:6.5.0
     ports:
-      - "8091:8091"
-
+      - "8091-8096:8091-8096"
+      - "11210-11211:11210-11211"
 volumes:
   mongo_kafkotest_data_dir:
