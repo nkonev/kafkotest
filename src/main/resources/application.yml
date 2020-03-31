@@ -13,7 +13,7 @@ spring:
         isolation.level: read_committed
         enable.auto.commit: false
         # increase batch consuming: set max.poll.records
-        max.poll.records: 8000
+        max.poll.records: 20
     producer:
       key-serializer: org.apache.kafka.common.serialization.StringSerializer
       value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
@@ -38,3 +38,4 @@ spring:
 
 tpd:
   topic-name: advice-topic
+  no-rollback-for: "java.lang.RuntimeException"

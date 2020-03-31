@@ -1,7 +1,9 @@
 package com.example.kafkotest;
 
+import io.tpd.kafkaexample.DocumentDlq;
 import io.tpd.kafkaexample.PracticalAdvice;
 import org.apache.kafka.clients.admin.NewTopic;
+import org.apache.kafka.common.TopicPartition;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,13 +14,26 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.kafka.annotation.KafkaListener;
+import org.springframework.kafka.config.ConcurrentKafkaListenerContainerFactory;
+import org.springframework.kafka.config.KafkaListenerContainerFactory;
+import org.springframework.kafka.core.ConsumerFactory;
 import org.springframework.kafka.core.KafkaTemplate;
+import org.springframework.kafka.listener.*;
+import org.springframework.kafka.support.KafkaHeaders;
+import org.springframework.messaging.MessageHeaders;
 import org.springframework.messaging.handler.annotation.Payload;
 import org.springframework.transaction.annotation.Transactional;
 import javax.annotation.PostConstruct;
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.time.LocalDateTime;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.UUID;
 import java.util.stream.IntStream;
+
+import static java.util.Optional.ofNullable;
 
 // https://thepracticaldeveloper.com/2018/11/24/spring-boot-kafka-config/
 @SpringBootApplication
@@ -39,23 +54,67 @@ public class KafkotestApplication implements CommandLineRunner {
 	@Autowired
 	private MongoTemplate mongoTemplate;
 
-	private final int messagesCount = 1_000_000;
+	private final int messagesCount = 30;
 
-	@Transactional
-	@KafkaListener(topics = "${tpd.topic-name}", clientIdPrefix = "json")
+	private static final String errorHandlerBeanName = "listen3ErrorHandler";
+
+	@Value("${tpd.no-rollback-for}")
+	private String va;
+
+	@Transactional(noRollbackForClassName="java.lang.RuntimeException")
+	@KafkaListener(topics = "${tpd.topic-name}", clientIdPrefix = "json", errorHandler = errorHandlerBeanName
+			 )
 	public void listenAsObject(
 			@Payload List<PracticalAdvice> payloads
-			//@Payload PracticalAdvice payload
 	) {
+		logger.info("received batch of {}", payloads.size());
 		for (PracticalAdvice payload: payloads) {
-			int integer = Integer.parseInt(payload.getIdentifier());
-			if (integer%10000 == 0 || integer == messagesCount-1) {
-				logger.info("received:  Payload: {}", payload);
-			}
-			//mongoTemplate.insert(payload);
+			logger.info("received:  Payload: {}", payload);
+			mongoTemplate.insert(payload);
 		}
-		mongoTemplate.insert(payloads, PracticalAdvice.class);
+		//mongoTemplate.insert(payloads, PracticalAdvice.class);
 	}
+
+
+	/*@Bean
+	BatchErrorHandler batchErrorHandler() {
+		return new BatchLoggingErrorHandler() {
+			// я должен не только коммитнуть транзакцию
+			// но и где-то перемотать оффсет
+			@Override
+			public boolean isAckAfterHandle() {
+				return true;
+			}
+		};
+	}*/
+
+	@Bean(name = errorHandlerBeanName)
+	public ConsumerAwareListenerErrorHandler listen3ErrorHandler() {
+		return (m, e, c) -> {
+			// возвращая null мы проглатывает эксепшн
+			logger.error("Error on payload: {}", m.getPayload(), e);
+			return null;
+		};
+	}
+
+	/*@Bean
+	public KafkaListenerContainerFactory<ConcurrentMessageListenerContainer<String, Object>>
+	kafkaListenerContainerFactory(ConsumerFactory<String, Object> cf
+//			, ContainerProperties containerProperties
+	) {
+		ConcurrentKafkaListenerContainerFactory<String, Object> factory = new ConcurrentKafkaListenerContainerFactory<>();
+		factory.setBatchListener(true);
+		factory.setBatchErrorHandler(new BatchLoggingErrorHandler());
+		factory.setConsumerFactory(cf);
+//		factory.getContainerProperties().
+		return factory;
+	}*/
+
+	/*@Bean
+	public BatchErrorHandler batchErrorHandler() {
+		return new BatchLoggingErrorHandler();
+	}*/
+
 
 	@Bean
 	public NewTopic adviceTopic() {
@@ -77,5 +136,9 @@ public class KafkotestApplication implements CommandLineRunner {
 		if (!mongoTemplate.collectionExists(PracticalAdvice.class)) {
 			mongoTemplate.createCollection(PracticalAdvice.class);
 		}
+		if (!mongoTemplate.collectionExists(DocumentDlq.class)) {
+			mongoTemplate.createCollection(DocumentDlq.class);
+		}
+
 	}
 }
