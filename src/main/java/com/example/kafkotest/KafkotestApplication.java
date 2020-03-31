@@ -61,8 +61,8 @@ public class KafkotestApplication implements CommandLineRunner {
 	@Value("${tpd.no-rollback-for}")
 	private String va;
 
-	@Transactional(noRollbackForClassName="java.lang.RuntimeException")
-	@KafkaListener(topics = "${tpd.topic-name}", clientIdPrefix = "json", errorHandler = errorHandlerBeanName
+	@Transactional
+	@KafkaListener(topics = "${tpd.topic-name}", clientIdPrefix = "json"//, errorHandler = errorHandlerBeanName
 			 )
 	public void listenAsObject(
 			@Payload List<PracticalAdvice> payloads
@@ -70,7 +70,15 @@ public class KafkotestApplication implements CommandLineRunner {
 		logger.info("received batch of {}", payloads.size());
 		for (PracticalAdvice payload: payloads) {
 			logger.info("received:  Payload: {}", payload);
-			mongoTemplate.insert(payload);
+			try {
+				mongoTemplate.insert(payload);
+			} catch (Exception e) {
+				logger.error("Error on payload: {}", payload, e);
+				StringWriter sw = new StringWriter();
+				e.printStackTrace(new PrintWriter(sw));
+				String exceptionAsString = sw.toString();
+				mongoTemplate.insert(new DocumentDlq(null, e.getClass().getName(), exceptionAsString));
+			}
 		}
 		//mongoTemplate.insert(payloads, PracticalAdvice.class);
 	}
@@ -86,16 +94,29 @@ public class KafkotestApplication implements CommandLineRunner {
 				return true;
 			}
 		};
-	}*/
+	}
 
 	@Bean(name = errorHandlerBeanName)
 	public ConsumerAwareListenerErrorHandler listen3ErrorHandler() {
 		return (m, e, c) -> {
 			// возвращая null мы проглатывает эксепшн
 			logger.error("Error on payload: {}", m.getPayload(), e);
+			MessageHeaders headers = m.getHeaders();
+			List<String> topics = headers.get(KafkaHeaders.RECEIVED_TOPIC, List.class);
+			List<Integer> partitions = headers.get(KafkaHeaders.RECEIVED_PARTITION_ID, List.class); // ид партиций
+			List<Long> offsets = headers.get(KafkaHeaders.OFFSET, List.class); // оффсеты каждого сообщения из батча
+			Map<TopicPartition, Long> offsetsToReset = new HashMap<>();
+			for (int i = 0; i < topics.size(); i++) {
+				int index = i;
+				offsetsToReset.compute(
+						new TopicPartition(topics.get(i), partitions.get(i)),
+						(topicPartition, offset) -> offset == null ? offsets.get(index) : Math.min(offset, offsets.get(index))
+				);
+			}
+			offsetsToReset.forEach((k, v) -> c.seek(k, v+1));
 			return null;
 		};
-	}
+	}*/
 
 	/*@Bean
 	public KafkaListenerContainerFactory<ConcurrentMessageListenerContainer<String, Object>>
