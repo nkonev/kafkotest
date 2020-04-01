@@ -38,4 +38,3 @@ spring:
 
 tpd:
   topic-name: advice-topic
-  no-rollback-for: "java.lang.RuntimeException"
