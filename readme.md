@@ -175,6 +175,22 @@ MongoDB will inserts faster:
 2020-02-27 21:38:42.918  INFO 2424167 --- [ntainer#0-0-C-1] c.e.kafkotest.KafkotestApplication       : received:  Payload: PracticalAdvice{message='A Practical Advice Number 999999', identifier=999999, datetime=2020-02-27T21:38:05.340141}
 ```
 
+# nodebug, Intel turbo boost, Both Transactions + mongo bulk
+```
+2020-04-04 02:11:07.922  INFO 5576 --- [ntainer#0-0-C-1] o.s.k.l.KafkaMessageListenerContainer    : my-advice-app: partitions assigned: [advice-topic-0]
+2020-04-04 02:11:23.340  INFO 5576 --- [           main] c.e.kafkotest.KafkotestApplication       : All messages sent
+2020-04-04 02:11:25.664  INFO 5576 --- [ntainer#0-0-C-1] c.e.kafkotest.KafkotestApplication       : received:  Payload: PracticalAdvice{message='A Practical Advice Number 0', identifier=0, datetime=2020-04-04T02:11:04.121097}
+2020-04-04 02:12:11.777  INFO 5576 --- [ntainer#0-0-C-1] c.e.kafkotest.KafkotestApplication       : received:  Payload: PracticalAdvice{message='A Practical Advice Number 999999', identifier=999999, datetime=2020-04-04T02:11:23.340177}
+```
+
+# nodebug, Intel turbo boost, Both Transactions + mongo no bulk
+```
+2020-04-04 02:16:51.975  INFO 8106 --- [ntainer#0-0-C-1] o.s.k.l.KafkaMessageListenerContainer    : my-advice-app: partitions assigned: [advice-topic-0]
+2020-04-04 02:17:06.962  INFO 8106 --- [           main] c.e.kafkotest.KafkotestApplication       : All messages sent
+2020-04-04 02:17:09.601  INFO 8106 --- [ntainer#0-0-C-1] c.e.kafkotest.KafkotestApplication       : received:  Payload: PracticalAdvice{message='A Practical Advice Number 0', identifier=0, datetime=2020-04-04T02:16:48.317525}
+2020-04-04 02:21:45.629  INFO 8106 --- [ntainer#0-0-C-1] c.e.kafkotest.KafkotestApplication       : received:  Payload: PracticalAdvice{message='A Practical Advice Number 999999', identifier=999999, datetime=2020-04-04T02:17:06.962556}
+```
+
 # TODO
 * Add restart unless-stopped to docker-compose
 * Set volumes to Kafka and Zookeeper to be able to survive computer restart
