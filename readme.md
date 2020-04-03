@@ -209,6 +209,24 @@ MongoDB will inserts faster:
 ```
 = ~12m 12 s
 
+
+
+## Spring Boot 2.2.4, Kafka + Gridgain standalone transactions, batch Kafka, bulk Gridgain
+```
+2020-04-04 01:34:53.826  INFO 506770 --- [ntainer#0-0-C-1] o.s.k.l.KafkaMessageListenerContainer    : my-advice-app: partitions assigned: [advice-topic-0]
+2020-04-04 01:35:20.997  INFO 506770 --- [           main] c.e.kafkotest.KafkotestApplication       : All messages requested/sent
+2020-04-04 01:35:25.550  INFO 506770 --- [ntainer#0-0-C-1] c.e.kafkotest.KafkotestApplication       : received:  Payload: PracticalAdvice{message='A Practical Advice Number 0', identifier=0, datetime=2020-04-04T01:34:49.676157}
+2020-04-04 01:35:57.800  INFO 506770 --- [ntainer#0-0-C-1] c.e.kafkotest.KafkotestApplication       : received:  Payload: PracticalAdvice{message='A Practical Advice Number 999999', identifier=999999, datetime=2020-04-04T01:35:20.997696}
+```
+
+## Spring Boot 2.2.4, Kafka + Gridgain standalone transactions, batch Kafka, no bulk Gridgain
+```
+2020-04-04 01:41:23.685  INFO 509412 --- [ntainer#0-0-C-1] o.s.k.l.KafkaMessageListenerContainer    : my-advice-app: partitions assigned: [advice-topic-0]
+2020-04-04 01:41:49.352  INFO 509412 --- [           main] c.e.kafkotest.KafkotestApplication       : All messages requested/sent
+2020-04-04 01:41:53.587  INFO 509412 --- [ntainer#0-0-C-1] c.e.kafkotest.KafkotestApplication       : received:  Payload: PracticalAdvice{message='A Practical Advice Number 0', identifier=0, datetime=2020-04-04T01:41:20.024945}
+2020-04-04 01:47:33.596  INFO 509412 --- [ntainer#0-0-C-1] c.e.kafkotest.KafkotestApplication       : received:  Payload: PracticalAdvice{message='A Practical Advice Number 999999', identifier=999999, datetime=2020-04-04T01:41:49.352133}
+```
+
 # TODO
 * Add restart unless-stopped to docker-compose
 * Set volumes to Kafka and Zookeeper to be able to survive computer restart

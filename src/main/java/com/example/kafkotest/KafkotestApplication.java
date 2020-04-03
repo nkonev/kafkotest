@@ -4,7 +4,6 @@ import io.tpd.kafkaexample.PracticalAdvice;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
-import org.apache.ignite.springdata20.repository.config.EnableIgniteRepositories;
 import org.apache.kafka.clients.admin.NewTopic;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -21,14 +20,11 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RestController;
+
 import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Map;
-import java.util.TreeMap;
 import java.util.concurrent.TimeUnit;
-import java.util.function.Function;
-import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 // https://thepracticaldeveloper.com/2018/11/24/spring-boot-kafka-config/
@@ -72,9 +68,10 @@ public class KafkotestApplication implements CommandLineRunner {
 				logger.info("received:  Payload: {}", payload);
 			}
 			//mongoTemplate.insert(payload);
+			repository.save(payload.getIdentifier(), payload);
 		}
-		Map<String, PracticalAdvice> collect = payloads.stream().collect(Collectors.toMap(PracticalAdvice::getIdentifier, Function.identity(), (practicalAdvice, practicalAdvice2) -> practicalAdvice, TreeMap::new));
-		repository.save(collect);
+//		Map<String, PracticalAdvice> collect = payloads.stream().collect(Collectors.toMap(PracticalAdvice::getIdentifier, Function.identity(), (practicalAdvice, practicalAdvice2) -> practicalAdvice, TreeMap::new));
+//		repository.save(collect);
 	}
 
 	@Bean
