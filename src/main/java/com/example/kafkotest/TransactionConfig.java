@@ -1,13 +1,12 @@
 package com.example.kafkotest;
 
-import com.mongodb.TransactionOptions;
-import com.mongodb.WriteConcern;
+import org.apache.ignite.Ignite;
+import org.apache.ignite.configuration.IgniteConfiguration;
+import org.apache.ignite.transactions.spring.SpringTransactionManager;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.data.mongodb.MongoDatabaseFactory;
-import org.springframework.data.mongodb.MongoDbFactory;
-import org.springframework.data.mongodb.MongoTransactionManager;
 import org.springframework.kafka.transaction.ChainedKafkaTransactionManager;
 import org.springframework.kafka.transaction.KafkaTransactionManager;
 import org.springframework.transaction.TransactionManager;
@@ -19,21 +18,23 @@ import org.springframework.transaction.annotation.TransactionManagementConfigure
 public class TransactionConfig implements TransactionManagementConfigurer {
 
     @Bean
-    public MongoTransactionManager transactionManager(MongoDatabaseFactory dbFactory) {
-        MongoTransactionManager mongoTransactionManager = new MongoTransactionManager(dbFactory);
-        mongoTransactionManager.setOptions(TransactionOptions.builder().writeConcern(WriteConcern.JOURNALED).build());
-        return mongoTransactionManager;
+    public SpringTransactionManager transactionManager(Ignite ignite, ApplicationContext applicationContext) {
+        SpringTransactionManager transactionManager = new SpringTransactionManager();
+        transactionManager.setApplicationContext(applicationContext);
+        //transactionManager.setConfiguration(configuration);
+        transactionManager.setIgniteInstanceName(IgniteCustomConfig.IN);
+        return transactionManager;
     }
 
     @Autowired
     private KafkaTransactionManager kafkaTransactionManager;
 
     @Autowired
-    private MongoTransactionManager mongoTransactionManager;
+    private SpringTransactionManager igniteTransactionManager;
 
     @Override
     public TransactionManager annotationDrivenTransactionManager() {
-        return new ChainedKafkaTransactionManager<>(kafkaTransactionManager, mongoTransactionManager);
+        return new ChainedKafkaTransactionManager<>(kafkaTransactionManager, igniteTransactionManager);
     }
 
 }

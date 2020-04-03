@@ -111,15 +111,14 @@ services:
       KSQL_LISTENERS: "http://0.0.0.0:8088"
       KSQL_CACHE_MAX_BYTES_BUFFERING: 0
 
-  mongo:
-    image: mongo:4.2.6-bionic
-    restart: unless-stopped
-    ports:
-      - "27017:27017"
+  # https://www.gridgain.com/docs/8.5/installation-guide/installing-using-docker
+  gridgain:
+    image: gridgain/community:8.7.14-openjdk11
+    network_mode: host
     volumes:
-      - mongo_kafkotest_data_dir:/data/db
-      - ./docker/mongo/docker-entrypoint-initdb.d:/docker-entrypoint-initdb.d
-    command: ["--replSet", "rs0"]
+      - gridgain_kafkotest_data_dir:/persistence
+    environment:
+      persistence-volume: /persistence
 
 volumes:
-  mongo_kafkotest_data_dir:
+  gridgain_kafkotest_data_dir:
