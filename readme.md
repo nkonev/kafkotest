@@ -175,6 +175,36 @@ MongoDB will inserts faster:
 2020-02-27 21:38:42.918  INFO 2424167 --- [ntainer#0-0-C-1] c.e.kafkotest.KafkotestApplication       : received:  Payload: PracticalAdvice{message='A Practical Advice Number 999999', identifier=999999, datetime=2020-02-27T21:38:05.340141}
 ```
 
+## W/O transactions on GET
+2020-04-03 23:37:36.971  INFO 483895 --- [           main] c.e.kafkotest.KafkotestApplication       : Start sending messages
+2020-04-03 23:37:36.973  INFO 483895 --- [           main] c.e.kafkotest.KafkotestApplication       : Sending: 0
+2020-04-03 23:37:52.995  INFO 483895 --- [           main] c.e.kafkotest.KafkotestApplication       : Sending: 10000
+2020-04-03 23:38:06.823  INFO 483895 --- [           main] c.e.kafkotest.KafkotestApplication       : Sending: 20000
+2020-04-03 23:38:20.439  INFO 483895 --- [           main] c.e.kafkotest.KafkotestApplication       : Sending: 30000
+2020-04-03 23:38:34.097  INFO 483895 --- [           main] c.e.kafkotest.KafkotestApplication       : Sending: 40000
+2020-04-03 23:38:47.961  INFO 483895 --- [           main] c.e.kafkotest.KafkotestApplication       : Sending: 50000
+2020-04-03 23:39:02.381  INFO 483895 --- [           main] c.e.kafkotest.KafkotestApplication       : Sending: 60000
+2020-04-03 23:39:16.024  INFO 483895 --- [           main] c.e.kafkotest.KafkotestApplication       : Sending: 70000
+2020-04-03 23:39:29.701  INFO 483895 --- [           main] c.e.kafkotest.KafkotestApplication       : Sending: 80000
+2020-04-03 23:39:43.395  INFO 483895 --- [           main] c.e.kafkotest.KafkotestApplication       : Sending: 90000
+2020-04-03 23:39:56.801  INFO 483895 --- [           main] c.e.kafkotest.KafkotestApplication       : Sending: 100000
+= ~2m 20 s
+
+## With transactions on GET
+2020-04-03 23:41:19.256  INFO 484936 --- [           main] c.e.kafkotest.KafkotestApplication       : Start sending messages
+2020-04-03 23:41:19.257  INFO 484936 --- [           main] c.e.kafkotest.KafkotestApplication       : Sending: 0
+2020-04-03 23:42:31.166  INFO 484936 --- [           main] c.e.kafkotest.KafkotestApplication       : Sending: 10000
+2020-04-03 23:43:43.566  INFO 484936 --- [           main] c.e.kafkotest.KafkotestApplication       : Sending: 20000
+2020-04-03 23:44:59.258  INFO 484936 --- [           main] c.e.kafkotest.KafkotestApplication       : Sending: 30000
+2020-04-03 23:46:11.676  INFO 484936 --- [           main] c.e.kafkotest.KafkotestApplication       : Sending: 40000
+2020-04-03 23:47:26.907  INFO 484936 --- [           main] c.e.kafkotest.KafkotestApplication       : Sending: 50000
+2020-04-03 23:48:40.586  INFO 484936 --- [           main] c.e.kafkotest.KafkotestApplication       : Sending: 60000
+2020-04-03 23:49:54.376  INFO 484936 --- [           main] c.e.kafkotest.KafkotestApplication       : Sending: 70000
+2020-04-03 23:51:07.859  INFO 484936 --- [           main] c.e.kafkotest.KafkotestApplication       : Sending: 80000
+2020-04-03 23:52:20.099  INFO 484936 --- [           main] c.e.kafkotest.KafkotestApplication       : Sending: 90000
+2020-04-03 23:53:32.792  INFO 484936 --- [           main] c.e.kafkotest.KafkotestApplication       : Sending: 100000
+= ~12m 12 s
+
 # TODO
 * Add restart unless-stopped to docker-compose
 * Set volumes to Kafka and Zookeeper to be able to survive computer restart

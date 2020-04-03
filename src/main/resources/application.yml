@@ -1,4 +1,6 @@
 #logging.level.org.springframework.kafka.listener: DEBUG
+server:
+  port: 8283
 
 spring:
   kafka:
