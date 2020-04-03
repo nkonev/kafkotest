@@ -16,7 +16,18 @@
 
 	<properties>
 		<java.version>11</java.version>
+		<gridgain.version>8.7.14</gridgain.version>
 	</properties>
+
+	<dependencyManagement>
+		<dependencies>
+			<dependency>
+				<groupId>com.h2database</groupId>
+				<artifactId>h2</artifactId>
+				<version>1.4.197</version>
+			</dependency>
+		</dependencies>
+	</dependencyManagement>
 
 	<dependencies>
 		<dependency>
@@ -63,9 +74,21 @@
 			<artifactId>spring-cloud-commons</artifactId>
 			<version>2.2.1.RELEASE</version>
 		</dependency>
+
 		<dependency>
-			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-starter-data-mongodb</artifactId>
+			<groupId>org.gridgain</groupId>
+			<artifactId>ignite-spring-data_2.0</artifactId>
+			<version>${gridgain.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.gridgain</groupId>
+			<artifactId>ignite-core</artifactId>
+			<version>${gridgain.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.gridgain</groupId>
+			<artifactId>ignite-spring</artifactId>
+			<version>${gridgain.version}</version>
 		</dependency>
 	</dependencies>
 
@@ -77,5 +100,12 @@
 			</plugin>
 		</plugins>
 	</build>
+
+	<repositories>
+		<repository>
+			<id>GridGain External Repository</id>
+			<url>http://www.gridgainsystems.com/nexus/content/repositories/external</url>
+		</repository>
+	</repositories>
 
 </project>

@@ -1,10 +1,10 @@
 package com.example.kafkotest;
 
 import io.tpd.kafkaexample.PracticalAdvice;
-import okhttp3.Call;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
+import org.apache.ignite.springdata20.repository.config.EnableIgniteRepositories;
 import org.apache.kafka.clients.admin.NewTopic;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -13,9 +13,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.boot.web.server.LocalServerPort;
 import org.springframework.context.annotation.Bean;
-import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.messaging.handler.annotation.Payload;
@@ -23,12 +21,14 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RestController;
-
-import javax.annotation.PostConstruct;
 import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Map;
+import java.util.TreeMap;
 import java.util.concurrent.TimeUnit;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 // https://thepracticaldeveloper.com/2018/11/24/spring-boot-kafka-config/
@@ -49,7 +49,7 @@ public class KafkotestApplication implements CommandLineRunner {
 	private KafkaTemplate<String, Object> template;
 
 	@Autowired
-	private MongoTemplate mongoTemplate;
+	private PracticalAdviceRepository repository;
 
 	private final int messagesCount = 1_000_000;
 
@@ -73,7 +73,8 @@ public class KafkotestApplication implements CommandLineRunner {
 			}
 			//mongoTemplate.insert(payload);
 		}
-		mongoTemplate.insert(payloads, PracticalAdvice.class);
+		Map<String, PracticalAdvice> collect = payloads.stream().collect(Collectors.toMap(PracticalAdvice::getIdentifier, Function.identity(), (practicalAdvice, practicalAdvice2) -> practicalAdvice, TreeMap::new));
+		repository.save(collect);
 	}
 
 	@Bean
@@ -81,10 +82,10 @@ public class KafkotestApplication implements CommandLineRunner {
 		return new NewTopic(topicName, 1, (short) 3);
 	}
 
-	//@Transactional
+	@Transactional
 	@GetMapping("/advice/{id}")
 	public PracticalAdvice getFromDb(@PathVariable("id") String id) {
-		PracticalAdvice byId = mongoTemplate.findById(id, PracticalAdvice.class);
+		PracticalAdvice byId = repository.findById(id).get();
 		return byId;
 	}
 
@@ -124,11 +125,4 @@ public class KafkotestApplication implements CommandLineRunner {
 		logger.info("All messages requested/sent");
 	}
 
-	@PostConstruct
-	public void pc() {
-		// should not be in transaction
-		if (!mongoTemplate.collectionExists(PracticalAdvice.class)) {
-			mongoTemplate.createCollection(PracticalAdvice.class);
-		}
-	}
 }
