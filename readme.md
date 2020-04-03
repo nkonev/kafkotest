@@ -176,6 +176,7 @@ MongoDB will inserts faster:
 ```
 
 ## W/O transactions on GET
+```
 2020-04-03 23:37:36.971  INFO 483895 --- [           main] c.e.kafkotest.KafkotestApplication       : Start sending messages
 2020-04-03 23:37:36.973  INFO 483895 --- [           main] c.e.kafkotest.KafkotestApplication       : Sending: 0
 2020-04-03 23:37:52.995  INFO 483895 --- [           main] c.e.kafkotest.KafkotestApplication       : Sending: 10000
@@ -188,9 +189,11 @@ MongoDB will inserts faster:
 2020-04-03 23:39:29.701  INFO 483895 --- [           main] c.e.kafkotest.KafkotestApplication       : Sending: 80000
 2020-04-03 23:39:43.395  INFO 483895 --- [           main] c.e.kafkotest.KafkotestApplication       : Sending: 90000
 2020-04-03 23:39:56.801  INFO 483895 --- [           main] c.e.kafkotest.KafkotestApplication       : Sending: 100000
+```
 = ~2m 20 s
 
 ## With transactions on GET
+```
 2020-04-03 23:41:19.256  INFO 484936 --- [           main] c.e.kafkotest.KafkotestApplication       : Start sending messages
 2020-04-03 23:41:19.257  INFO 484936 --- [           main] c.e.kafkotest.KafkotestApplication       : Sending: 0
 2020-04-03 23:42:31.166  INFO 484936 --- [           main] c.e.kafkotest.KafkotestApplication       : Sending: 10000
@@ -203,6 +206,7 @@ MongoDB will inserts faster:
 2020-04-03 23:51:07.859  INFO 484936 --- [           main] c.e.kafkotest.KafkotestApplication       : Sending: 80000
 2020-04-03 23:52:20.099  INFO 484936 --- [           main] c.e.kafkotest.KafkotestApplication       : Sending: 90000
 2020-04-03 23:53:32.792  INFO 484936 --- [           main] c.e.kafkotest.KafkotestApplication       : Sending: 100000
+```
 = ~12m 12 s
 
 # TODO
