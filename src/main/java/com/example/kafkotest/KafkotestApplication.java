@@ -59,7 +59,7 @@ public class KafkotestApplication implements CommandLineRunner {
 
 	@Bean
 	public NewTopic adviceTopic() {
-		return new NewTopic(topicName, 1, (short) 3);
+		return new NewTopic(topicName, 1, (short) 1);
 	}
 
 	@Override
