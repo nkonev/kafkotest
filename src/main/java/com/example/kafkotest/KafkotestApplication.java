@@ -22,7 +22,7 @@ import java.util.stream.IntStream;
 
 // https://thepracticaldeveloper.com/2018/11/24/spring-boot-kafka-config/
 @SpringBootApplication
-public class KafkotestApplication implements CommandLineRunner {
+public class KafkotestApplication {
 
 	private static final Logger logger = LoggerFactory.getLogger(KafkotestApplication.class);
 
@@ -39,8 +39,6 @@ public class KafkotestApplication implements CommandLineRunner {
 	@Autowired
 	private MongoTemplate mongoTemplate;
 
-	private final int messagesCount = 1_000_000;
-
 	@Transactional
 	@KafkaListener(topics = "${tpd.topic-name}", clientIdPrefix = "json")
 	public void listenAsObject(
@@ -48,10 +46,7 @@ public class KafkotestApplication implements CommandLineRunner {
 			//@Payload PracticalAdvice payload
 	) {
 		for (PracticalAdvice payload: payloads) {
-			int integer = Integer.parseInt(payload.getIdentifier());
-			if (integer%10000 == 0 || integer == messagesCount-1) {
-				logger.info("received:  Payload: {}", payload);
-			}
+			logger.info("received:  Payload: {}", payload);
 			//mongoTemplate.insert(payload);
 		}
 		mongoTemplate.insert(payloads, PracticalAdvice.class);
@@ -62,14 +57,6 @@ public class KafkotestApplication implements CommandLineRunner {
 		return new NewTopic(topicName, 1, (short) 1);
 	}
 
-	@Override
-	@Transactional
-	public void run(String... args) {
-		IntStream.range(0, messagesCount).forEach(i -> {
-			this.template.send(topicName, String.valueOf(i), new PracticalAdvice(String.valueOf(i), "A Practical Advice Number " + i, LocalDateTime.now()));
-		});
-		logger.info("All messages sent");
-	}
 
 	@PostConstruct
 	public void pc() {

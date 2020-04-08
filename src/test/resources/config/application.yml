@@ -1,0 +1,11 @@
+embedded:
+  zookeeper:
+    dockerImage: 'confluentinc/cp-zookeeper:5.3.1'
+    waitTimeoutInSeconds: 180
+    fileSystemBind:
+      enabled: false
+  kafka:
+    dockerImage: 'confluentinc/cp-enterprise-kafka:5.3.1'
+    waitTimeoutInSeconds: 180
+    fileSystemBind:
+      enabled: false
