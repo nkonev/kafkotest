@@ -32,7 +32,7 @@ public class TransactionConfig implements TransactionManagementConfigurer {
 
     @Override
     public TransactionManager annotationDrivenTransactionManager() {
-        return new ChainedKafkaTransactionManager<>(kafkaTransactionManager, mongoTransactionManager);
+        return new ChainedKafkaTransactionManager<>(kafkaTransactionManager/*, mongoTransactionManager*/);
     }
 
 }
