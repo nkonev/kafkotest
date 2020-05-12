@@ -5,6 +5,11 @@ management.endpoint.health.show-details: always
 server:
   port: 8080
 
+ignite-client:
+  addresses: 127.0.0.1:10800
+  timeout: 10000
+  tcpNoDelay: false
+
 spring:
   kafka:
     consumer:

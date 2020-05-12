@@ -23,6 +23,7 @@ public class TransactionConfig implements TransactionManagementConfigurer {
         transactionManager.setApplicationContext(applicationContext);
         //transactionManager.setConfiguration(configuration);
         transactionManager.setIgniteInstanceName(IgniteCustomConfig.IN);
+        transactionManager.setIgniteInstanceName(); // What ?
         return transactionManager;
     }
 
