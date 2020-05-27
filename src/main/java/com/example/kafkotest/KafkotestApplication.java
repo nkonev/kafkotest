@@ -10,6 +10,11 @@ import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
+import org.springframework.data.redis.connection.RedisConnectionFactory;
+import org.springframework.data.redis.core.RedisKeyValueTemplate;
+import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.serializer.GenericJackson2JsonRedisSerializer;
+import org.springframework.data.redis.serializer.StringRedisSerializer;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.messaging.handler.annotation.Payload;
@@ -35,7 +40,16 @@ public class KafkotestApplication implements CommandLineRunner {
 	private KafkaTemplate<String, PracticalAdvice> template;
 
 	@Autowired
-	private PracticalAdviceRepository practicalAdviceRepository;
+	private RedisTemplate<String, PracticalAdvice> redisTemplate;
+
+	@Bean
+	public RedisTemplate<String, PracticalAdvice> redisTemplate(RedisConnectionFactory connectionFactory) {
+		RedisTemplate<String, PracticalAdvice> redisTemplate = new RedisTemplate<>();
+		redisTemplate.setConnectionFactory(connectionFactory);
+		redisTemplate.setKeySerializer(new StringRedisSerializer());
+		redisTemplate.setValueSerializer(new GenericJackson2JsonRedisSerializer());
+		return redisTemplate;
+	}
 
 	private final int messagesCount = 1_000_000;
 
@@ -50,8 +64,8 @@ public class KafkotestApplication implements CommandLineRunner {
 			if (integer%10000 == 0 || integer == messagesCount-1) {
 				logger.info("received:  Payload: {}", payload);
 			}
+			redisTemplate.opsForValue().set(payload.getIdentifier(), payload);
 		}
-		practicalAdviceRepository.saveAll(payloads);
 	}
 
 	@Bean

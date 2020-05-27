@@ -1,14 +1,10 @@
 package io.tpd.kafkaexample;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import org.springframework.data.annotation.Id;
 import java.time.LocalDateTime;
-import org.springframework.data.redis.core.RedisHash;
 
-@RedisHash
 public class PracticalAdvice {
 
-    @Id
     private String identifier;
     private String message;
     private LocalDateTime datetime;
