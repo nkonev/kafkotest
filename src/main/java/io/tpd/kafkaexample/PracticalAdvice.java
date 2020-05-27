@@ -2,11 +2,10 @@ package io.tpd.kafkaexample;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import org.springframework.data.annotation.Id;
-import org.springframework.data.mongodb.core.mapping.Document;
-
 import java.time.LocalDateTime;
+import org.springframework.data.redis.core.RedisHash;
 
-@Document
+@RedisHash
 public class PracticalAdvice {
 
     @Id

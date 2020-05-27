@@ -10,12 +10,10 @@ import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
-import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.messaging.handler.annotation.Payload;
 import org.springframework.transaction.annotation.Transactional;
-import javax.annotation.PostConstruct;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.IntStream;
@@ -34,10 +32,10 @@ public class KafkotestApplication implements CommandLineRunner {
 	private String topicName;
 
 	@Autowired
-	private KafkaTemplate<String, Object> template;
+	private KafkaTemplate<String, PracticalAdvice> template;
 
 	@Autowired
-	private MongoTemplate mongoTemplate;
+	private PracticalAdviceRepository practicalAdviceRepository;
 
 	private final int messagesCount = 1_000_000;
 
@@ -52,10 +50,8 @@ public class KafkotestApplication implements CommandLineRunner {
 			if (integer%10000 == 0 || integer == messagesCount-1) {
 				logger.info("received:  Payload: {}", payload);
 			}
-			//mongoTemplate.insert(payload);
-			//payload.setIdentifier(null);
 		}
-		mongoTemplate.insert(payloads, PracticalAdvice.class);
+		practicalAdviceRepository.saveAll(payloads);
 	}
 
 	@Bean
@@ -72,11 +68,4 @@ public class KafkotestApplication implements CommandLineRunner {
 		logger.info("All messages sent");
 	}
 
-	@PostConstruct
-	public void pc() {
-		// should not be in transaction
-		if (!mongoTemplate.collectionExists(PracticalAdvice.class)) {
-			mongoTemplate.createCollection(PracticalAdvice.class);
-		}
-	}
 }
