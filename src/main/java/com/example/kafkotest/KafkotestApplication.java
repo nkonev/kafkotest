@@ -7,20 +7,23 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
 import org.springframework.kafka.annotation.KafkaListener;
+import org.springframework.kafka.annotation.TopicPartition;
 import org.springframework.kafka.core.*;
 import org.springframework.messaging.handler.annotation.Payload;
 
 import java.time.LocalDateTime;
 import java.util.stream.IntStream;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 // https://thepracticaldeveloper.com/2018/11/24/spring-boot-kafka-config/
 @SpringBootApplication
-public class KafkotestApplication implements CommandLineRunner {
+@RestController
+public class KafkotestApplication {
 
 	private static final Logger logger = LoggerFactory.getLogger(KafkotestApplication.class);
 
@@ -34,22 +37,20 @@ public class KafkotestApplication implements CommandLineRunner {
 	@Autowired
 	private KafkaTemplate<String, Object> template;
 
-	private final int messagesCount = 1_000_000;
+	private final int messagesCount = 10;
 
-	@KafkaListener(topics = "${tpd.topic-name}", clientIdPrefix = "json")
+	@KafkaListener(groupId = "consumer-group", topicPartitions = {@TopicPartition(topic = "${tpd.topic-name}", partitions={"0", "1"})})
 	public void listenAsObject(ConsumerRecord<String, PracticalAdvice> cr, @Payload PracticalAdvice payload) {
-		if (cr.key().equals("0") || cr.key().equals(String.valueOf(messagesCount-1))) {
-			logger.info("received: key {}: | Payload: {} | Record: {}", cr.key(), payload, cr.toString());
-		}
+		logger.info("received: key {}: | Payload: {} | Record: {}", cr.key(), payload, cr.toString());
 	}
 
 	@Bean
 	public NewTopic adviceTopic() {
-		return new NewTopic(topicName, 1, (short) 1);
+		return new NewTopic(topicName, 2, (short) 1);
 	}
 
-	@Override
-	public void run(String... args) {
+	@PostMapping("/send")
+	public void f() {
 		IntStream.range(0, messagesCount).forEach(i -> this.template.send(topicName, String.valueOf(i),
 				new PracticalAdvice("A Practical Advice Number " + i, i, LocalDateTime.now())));
 		logger.info("All messages sent");

@@ -45,3 +45,10 @@ services:
       KAFKA_REST_LISTENERS: "http://0.0.0.0:8082"
       # https://docs.confluent.io/current/kafka-rest/config.html
       KAFKA_REST_ZOOKEEPER_CONNECT: 'zookeeper:2181'
+
+networks:
+  default:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 172.16.57.0/24
