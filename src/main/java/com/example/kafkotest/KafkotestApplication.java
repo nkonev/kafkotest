@@ -2,6 +2,7 @@ package com.example.kafkotest;
 
 import io.tpd.kafkaexample.PracticalAdvice;
 import org.apache.kafka.clients.admin.NewTopic;
+import org.apache.kafka.clients.consumer.Consumer;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -39,7 +40,31 @@ public class KafkotestApplication {
 
 	private final int messagesCount = 10;
 
-	@KafkaListener(groupId = "consumer-group", topicPartitions = {@TopicPartition(topic = "${tpd.topic-name}", partitions={"0", "1"})})
+	// https://docs.spring.io/spring-kafka/docs/current/reference/html/#tip-assign-all-parts
+	@Bean
+	public PartitionFinder finder(ConsumerFactory<String, String> consumerFactory) {
+		return new PartitionFinder(consumerFactory);
+	}
+
+	public static class PartitionFinder {
+
+		private final ConsumerFactory<String, String> consumerFactory;
+
+		public PartitionFinder(ConsumerFactory<String, String> consumerFactory) {
+			this.consumerFactory = consumerFactory;
+		}
+
+		public String[] partitions(String topic) {
+			try (Consumer<String, String> consumer = consumerFactory.createConsumer()) {
+				return consumer.partitionsFor(topic).stream()
+						.map(pi -> "" + pi.partition())
+						.toArray(String[]::new);
+			}
+		}
+
+	}
+
+	@KafkaListener(groupId = "consumer-group", topicPartitions = {@TopicPartition(topic = "${tpd.topic-name}", partitions="#{@finder.partitions('${tpd.topic-name}')}")})
 	public void listenAsObject(ConsumerRecord<String, PracticalAdvice> cr, @Payload PracticalAdvice payload) {
 		logger.info("received: key {}: | Payload: {} | Record: {}", cr.key(), payload, cr.toString());
 	}
