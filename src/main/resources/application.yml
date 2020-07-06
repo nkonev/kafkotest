@@ -12,23 +12,15 @@ spring:
       properties:
         # https://kafka.apache.org/documentation/#configuration
         spring.json.trusted.packages: io.tpd.kafkaexample
-        isolation.level: read_committed
         enable.auto.commit: false
         # increase batch consuming: set max.poll.records
         max.poll.records: 8000
     producer:
       key-serializer: org.apache.kafka.common.serialization.StringSerializer
       value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
-      transaction-id-prefix: tx_${spring.cloud.client.ip-address}_
       properties:
-        # for ordering
-        max.in.flight.requests.per.connection: 1
-        enable.idempotence: true
-        # retries: 10000
         delivery.timeout.ms: 300000 # 5 minutes
         retry.backoff.ms: 1000
-        acks: all
-        #transactional.id: producer-1
     bootstrap-servers: localhost:19092
     # https://docs.spring.io/spring-boot/docs/current/reference/htmlsingle/#common-application-properties
     listener:
